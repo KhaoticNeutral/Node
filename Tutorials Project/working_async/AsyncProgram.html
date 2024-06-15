@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async Programming</title>
+</head>
+
+<body>
+    <h1>Async</h1>
+    Name:<br>
+    <input type="text">
+    <br><br>
+    <button class="callback">Callback</button>
+    <button class="promise">Promise</button>
+    <button class="await">Await</button>
+    <br><br>
+    <div class="output"></div>
+    <script>
+        const input = document.querySelector("input"),
+            callbackBtn = document.querySelector(".callback"),
+            promiseBtn = document.querySelector(".promise"),
+            awaitBtn = document.querySelector(".await"),
+            output = document.querySelector(".output");
+
+        callbackBtn.addEventListener("click", callBackFunc);
+        promiseBtn.addEventListener("click", promiseFunc);
+        awaitBtn.addEventListener("click", awaitFunc);
+
+        function callBackFunc() {
+            function fetchName(callback) {
+                setTimeout(() => {
+                    callback();
+                }, 0);
+                output.textContent = "Callback: Welcome "
+            }
+            fetchName(() => {
+                output.textContent += input.value;
+            })
+        }
+
+        // avoid nesting callbacks, the cause of callback hell. preferably use promises or async funcs w/ await.
+
+        function promiseFunc() {
+            function checkName() {
+                return new Promise((resolve, reject) => {
+                    if (input.value.length > 0) {
+                        resolve(true);
+                    } else {
+                        reject(false);
+                    }
+                })
+            }
+            checkName()
+                .then(() => setTimeout(() => {output.innerHTML += "Promise: Hello " + input.value}, 1000))
+                .catch(() => output.innerHTML = "Name cannot be empty");
+            output.innerHTML = "<p>Waiting for promise fulfilment...</p>";
+        }
+
+        function awaitFunc() {
+            function resetName() {
+                return new Promise((resolve, reject) => {
+                    if (input.value.length !== 0) {
+                        resolve(output.innerHTML = "Await: Hello there")
+                    } else if (input.value.length === 0){
+                        reject(output.innerHTML = "Name cannot be empty")
+                    }
+                })
+            }
+            async function nameWait() {
+                await resetName()
+                    .then(() => setTimeout(() => { output.innerHTML += "." }, 1000))
+                    .then(() => setTimeout(() => { output.innerHTML += "." }, 2000))
+                    .then(() => setTimeout(() => { output.innerHTML += ". " }, 3000))
+                    .then(() => setTimeout(() => { output.innerHTML += input.value }, 4000));
+            }
+            nameWait();
+        }
+    </script>
+</body>
+
+</html>
